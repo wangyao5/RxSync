@@ -1,7 +1,8 @@
 package com.rxsync;
 
 import android.util.Log;
-import java.lang.reflect.Array;
+
+import java.util.ArrayList;
 import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
@@ -14,12 +15,37 @@ public class SyncWorker {
         Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {
-                String[] arrays = new String[messages.size()];
-                int index = 0;
-                for (String message : messages) {
-                    Array.set(arrays, index++, message);
+                int size = messages.size();
+                String[] array = new String[size];
+                for (int index = 0 ; index < size; index ++){
+                    array[index] = messages.get(index);
                 }
-                return Observable.from(arrays);
+                return Observable.from(array);
+            }
+        }).subscribe(new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
+                Log.d(TAG, "onCompleted()");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "onError()", e);
+            }
+
+            @Override
+            public void onNext(String string) {
+                Log.d(TAG, "onNext(" + string + ")");
+                RxMappingProxy.getInstance().exec(string);
+            }
+        });
+    }
+
+    public void sync(final String[] messages) {
+        Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                return Observable.from(messages);
             }
         }).subscribe(new Subscriber<String>() {
             @Override

@@ -8,7 +8,9 @@ import android.widget.Toast;
 import com.rxsync.ICmdSubScribe;
 import com.rxsync.RxMappingProxy;
 import com.rxsync.SyncWorker;
-import com.rxsync.annotations.Param;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -23,16 +25,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                SyncWorker worker = new SyncWorker();
-//                List<String> cmds = new ArrayList<>();
-//                cmds.add("cmd://www/wangyao/1");
-//                cmds.add("cmd://www/wangyao2/2");
-//                cmds.add("cmd://www/wangyao3/3");
-//                worker.sync(cmds);
-
-                String cmd = mCmdEditText.getText().toString();
                 SyncWorker worker = new SyncWorker();
-                worker.sync(cmd);
+                List<String> cmds = new ArrayList<>();
+                cmds.add("cmd://www/wangyao/1?a=5&c=7");
+                cmds.add("cmd://www/wangyao2/2?a=6&d=8");
+                cmds.add("cmd://www/wangyao3/3?a=7&e=9");
+                worker.sync(cmds);
+
+//                String cmd = mCmdEditText.getText().toString();
+//                SyncWorker worker = new SyncWorker();
+//                worker.sync(cmd);
             }
         });
 
@@ -43,7 +45,12 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         subScribe = new ICmdSubScribe() {
             @Override
-            public void shutdown(String id, String time) {
+            public void shutdown(String id, String time, String a) {
+                Toast.makeText(MainActivity.this, "id:" + id + ",time:"+time, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void ok(String id, String time, String a) {
                 Toast.makeText(MainActivity.this, "id:" + id + ",time:"+time, Toast.LENGTH_LONG).show();
             }
         };
@@ -57,6 +64,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        RxMappingProxy.getInstance().unRegister(subScribe);
+        RxMappingProxy.getInstance().unRegister(subScribe.getClass());
     }
 }

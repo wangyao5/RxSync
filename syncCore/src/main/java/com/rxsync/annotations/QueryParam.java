@@ -10,6 +10,6 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({PARAMETER})
 @Documented
-public @interface Param {
+public @interface QueryParam {
     String value() default "";
 }
